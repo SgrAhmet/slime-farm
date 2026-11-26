@@ -354,7 +354,7 @@ func _rebuild() -> void:
 	_collector = null
 	_sapling = null
 	_tree = null
-	for slime: Node in _residents:
+	for slime in _residents:
 		if is_instance_valid(slime):
 			(slime as Vacuumable).corral_escape = false
 	_residents.clear()
@@ -597,7 +597,7 @@ func _update_population() -> void:
 	crowded = weight > capacity()
 	for s: Node in inside:
 		(s as Vacuumable).corral_escape = crowded
-	for s: Node in _residents:
+	for s in _residents:
 		if is_instance_valid(s) and not inside.has(s):
 			(s as Vacuumable).corral_escape = false  # kaçtı: dışarıda yine duvara çarpsın
 	_residents = inside
@@ -606,7 +606,7 @@ func _update_population() -> void:
 
 
 func _any_hungry_inside() -> bool:
-	for s: Node in _residents:
+	for s in _residents:
 		if is_instance_valid(s) and (s as Slime).is_hungry():
 			return true
 	return false
@@ -623,7 +623,7 @@ func _food_inside() -> bool:
 
 
 func _wanted_by_resident(food: ItemType) -> bool:
-	for s: Node in _residents:
+	for s in _residents:
 		if is_instance_valid(s) and (s as Slime).can_eat(food):
 			return true
 	return false
