@@ -1,6 +1,6 @@
 # Slime Farm — Geliştirme Kaydı
 
-Son güncelleme: 2026-11-26. Bu dosya, bir sonraki oturumda kaldığımız yerden devam
+Son güncelleme: 2026-11-27. Bu dosya, bir sonraki oturumda kaldığımız yerden devam
 edebilmek için yapılan her şeyin özetidir. Kod kuralları için `CLAUDE.md`'ye bak.
 
 ## Oyunun şu anki hali (özet)
@@ -223,9 +223,27 @@ kurar. Ana menüden 3 kayıt slotu, yatakta uyuyunca kayıt.
 - Godot: `C:\Users\Ahmet\Desktop\Code\Godot\Godot_v4.6.2-stable_win64_console.exe`
   (oyunu kullanıcıya açmak için `_win64.exe`, `Start-Process`).
 
+## Nerede kaldık (2026-11-27 oturum sonu)
+- Son yapılan: yeni meyve/sebzeler, kaya tavuğu, favori yiyecek, Slime Kitabı (B). Test
+  edildi ve GitHub'a gönderildi (`ea4f8e0`). Kullanıcı oyunu oynayıp beğendi.
+- Aynı gün daha önce: sesler (Sfx), kümes genişletme, gübre, kümes/tarla kaldırma,
+  README + ekran görüntüleri, GitHub reposu (https://github.com/SgrAhmet/slime-farm).
+- **Tam ekran denemesi kullanıcı isteğiyle tamamen geri alındı** — menüleri bozduğunu
+  söyledi. Tekrar denenecekse önce kullanıcıyla nasıl görünmesi gerektiği konuşulmalı
+  ve gerçek tam ekranda ekran görüntüsüyle doğrulanmalı (ekranı 1920x1080, Windows
+  ölçeği %125).
+- Kayıt slotları: Slot 1 = kullanıcının oyunu, Slot 2 = 25.000 jetonlu test kaydı.
+- Git: commit/push sadece kullanıcı isteyince. `gh` yok; düz `git push` çalışıyor.
+  `docs/images/.gdignore` README görsellerini Godot içe aktarımından dışarıda tutar.
+
 ## Bilinen eksikler / sonraki adım fikirleri
+- Kümes menüsü 5 seçenekle 181 px (ekran 180): üstten 1 px taşıyor. Görünüşü bozmadan
+  çözülmeli (ör. "Kaldır"ı alt menüye almak) — kullanıcıya önerildi, cevap bekliyor.
+- Pencere büyütülünce tam sayı ölçek yüzünden siyah kenar kalabiliyor (geri alınan konu).
+- Üreme mekaniği yok (tavuklar için kullanıcı "belki sonra" dedi).
 - Oyun içinden ana menüye dönüş / duraklatma menüsü yok (Esc menüsü önerildi).
-- Kümes, tarla ve geliştirmeler satıldıktan sonra kaldırılamıyor.
+- Kaldırmada para iadesi yok (yarısını iade önerildi).
+- Slime Kitabı sadece 12 temel türü gösteriyor; büyük slimelar için bölüm eklenebilir.
 - Ana menüde slot ekranı açıkken panel dekor slimeları kapatıyor.
 - Kümeste farklı renkler karışırsa toplayıcı yetişmeden gem yenip büyük slime oluşabilir.
 - Kullanıcının planı: para harcanacak yeni sistemler, haritanın güzelleştirilmesi.
