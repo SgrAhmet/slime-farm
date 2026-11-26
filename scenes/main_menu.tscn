@@ -1,0 +1,141 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/main_menu.gd" id="1_menu"]
+[ext_resource type="TileSet" path="res://assets/tileset.tres" id="2_tileset"]
+[ext_resource type="Theme" path="res://assets/ui_theme.tres" id="3_theme"]
+
+[node name="MainMenu" type="Node2D"]
+script = ExtResource("1_menu")
+
+[node name="Ground" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_tileset")
+
+[node name="Fences" type="TileMapLayer" parent="."]
+tile_set = ExtResource("2_tileset")
+
+[node name="Decor" type="Node2D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Root" type="Control" parent="UI"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("3_theme")
+
+[node name="Panel" type="PanelContainer" parent="UI/Root"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -90.0
+offset_top = 10.0
+offset_right = 90.0
+offset_bottom = 10.0
+grow_horizontal = 2
+
+[node name="Menu" type="VBoxContainer" parent="UI/Root/Panel"]
+layout_mode = 2
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Title" type="Label" parent="UI/Root/Panel/Menu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.94902, 0.909804, 0.427451, 1)
+theme_override_colors/font_outline_color = Color(0.227451, 0.145098, 0.086275, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "SLIME FARM"
+horizontal_alignment = 1
+
+[node name="MainButtons" type="VBoxContainer" parent="UI/Root/Panel/Menu"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="StartButton" type="Button" parent="UI/Root/Panel/Menu/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Oyuna Başla"
+
+[node name="QuitButton" type="Button" parent="UI/Root/Panel/Menu/MainButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(96, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Çıkış"
+
+[node name="SlotButtons" type="VBoxContainer" parent="UI/Root/Panel/Menu"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Row1" type="HBoxContainer" parent="UI/Root/Panel/Menu/SlotButtons"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Slot" type="Button" parent="UI/Root/Panel/Menu/SlotButtons/Row1"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Slot 1"
+
+[node name="Delete" type="Button" parent="UI/Root/Panel/Menu/SlotButtons/Row1"]
+custom_minimum_size = Vector2(38, 0)
+layout_mode = 2
+text = "Sil"
+
+[node name="Row2" type="HBoxContainer" parent="UI/Root/Panel/Menu/SlotButtons"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Slot" type="Button" parent="UI/Root/Panel/Menu/SlotButtons/Row2"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Slot 2"
+
+[node name="Delete" type="Button" parent="UI/Root/Panel/Menu/SlotButtons/Row2"]
+custom_minimum_size = Vector2(38, 0)
+layout_mode = 2
+text = "Sil"
+
+[node name="Row3" type="HBoxContainer" parent="UI/Root/Panel/Menu/SlotButtons"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Slot" type="Button" parent="UI/Root/Panel/Menu/SlotButtons/Row3"]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Slot 3"
+
+[node name="Delete" type="Button" parent="UI/Root/Panel/Menu/SlotButtons/Row3"]
+custom_minimum_size = Vector2(38, 0)
+layout_mode = 2
+text = "Sil"
+
+[node name="BackButton" type="Button" parent="UI/Root/Panel/Menu/SlotButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+size_flags_horizontal = 4
+text = "Geri"
+
+[node name="Fade" type="ColorRect" parent="UI/Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

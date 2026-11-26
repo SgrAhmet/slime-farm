@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/house.gd" id="1_house"]
+[ext_resource type="Texture2D" path="res://assets/house.png" id="2_tex"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_house"]
+size = Vector2(56, 22)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door"]
+size = Vector2(12, 6)
+
+[node name="House" type="StaticBody2D"]
+script = ExtResource("1_house")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -32)
+texture = ExtResource("2_tex")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -11)
+shape = SubResource("RectangleShape2D_house")
+
+[node name="DoorZone" type="Area2D" parent="."]
+position = Vector2(0, 4)
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DoorZone"]
+shape = SubResource("RectangleShape2D_door")

@@ -1,0 +1,30 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/pickup.gd" id="1_pickup"]
+[ext_resource type="Texture2D" path="res://assets/shadow.png" id="2_shadow"]
+[ext_resource type="Texture2D" path="res://assets/items.png" id="3_items"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pickup"]
+size = Vector2(6, 3)
+
+[node name="Pickup" type="CharacterBody2D"]
+collision_layer = 8
+collision_mask = 1
+motion_mode = 1
+script = ExtResource("1_pickup")
+sprite_base_y = -7.0
+
+[node name="Shadow" type="Sprite2D" parent="."]
+position = Vector2(0, -1)
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("2_shadow")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -7)
+texture = ExtResource("3_items")
+hframes = 3
+vframes = 14
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -1.5)
+shape = SubResource("RectangleShape2D_pickup")
