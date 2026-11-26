@@ -24,7 +24,7 @@ texture = ExtResource("2_shadow")
 position = Vector2(0, -8)
 texture = ExtResource("3_sheet")
 hframes = 6
-vframes = 3
+vframes = 5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 position = Vector2(0, -1.5)

@@ -19,6 +19,7 @@ kurar. Ana menüden 3 kayıt slotu, yatakta uyuyunca kayıt.
 | Sol tık | Seçili slotu fırlat (basılı tut = 0.3 sn'de bir) |
 | 1-8 / tekerlek | Envanter slotu seç |
 | E | Etkileşim (yatak = uyu+kaydet, arsa = satın al menüsü, toplayıcı = gemleri al) |
+| B | Slime Kitabı (keşfedilen türlerin bilgileri) |
 | F1 | Debug paneli (hız, zamanı durdur/+3 saat, para, ışınlanma, açlık, civciv büyüt, eşya ver, kaydet) |
 | Esc | Menüde geri / satın alma penceresini kapat |
 
@@ -98,6 +99,32 @@ kurar. Ana menüden 3 kayıt slotu, yatakta uyuyunca kayıt.
   mantığı; 72 px içinde 3'ten az kuş varsa 45 sn'de bir yenisi (civciv %50, tavuk %35,
   horoz %15). Çiftlikte 1, orman 1, yayla 1, dağ 3 yuva. Kayıtta `nests` = sayaçlar.
 - Üreme henüz yok (kullanıcı sonra isteyebilir).
+
+### Yeni yiyecekler ve kaya tavuğu
+- Meyve: **Yıldız Meyvesi** (`star_fruit`, sarı yapraklı ağaç `star_fruit_tree.tscn`; yayla 2,
+  dağ 1), **Ay Üzümü** (`moon_grape`, asma `grape_vine.tscn`, çarpışmasız; orman 3).
+- Sebze: **Pancar** (`beet`, `beet_patch.tscn`; orman 2, yayla 1), **Buz Turpu** (`ice_radish`,
+  `radish_patch.tscn`; dağ 3). Hepsi tarlaya ekilebilir (`GardenPlot.CROP_TREES`).
+- **Kaya Tavuğu** (`rock_hen`, et) ve **Kaya Civcivi** (`rock_chick`, büyüyünce kaya tavuğu;
+  `Chicken.GROWTH`). Taş yuva `chicken_nest_rock.tscn` (dağ 2, yayla 1); `ChickenNest`
+  artık `spawn_ids` / `spawn_chances` export'larıyla ne çıkacağını seçer.
+- `items.png` 18 satır (14-17 yeni yiyecekler), `chickens.png` 5 satır.
+
+### Favori yiyecek
+- `SlimeType.favorite`; `favorites()` büyük slimede iki türün favorisi. Favoriyi yiyince
+  her gemden 2 tane + "Favori! x2" yazısı. Aç slime ikon gösterirken %50 favorisini gösterir.
+- Favoriler: kırmızı elma, mavi pancar, gri kaya tavuğu, pembe yıldız meyvesi, kedi tavuk,
+  tavşan havuç, mantar ay üzümü, ejder horoz, yaprak pancar, keçi buz turpu,
+  kar yıldız meyvesi, tüy kaya tavuğu.
+
+### Slime Kitabı
+- `scripts/slime_book.gd` — `SlimeBook` (B ile aç/kapa, Esc kapatır). 12 tür ızgarası;
+  keşfedilmemiş tür siyah siluet ve "???". Bilgiler: ad, resim, yaşadığı yer
+  (`farm._slime_regions()`, INITIAL_SLIMES'tan), beslenme, favori, kısa tanım.
+- Keşif: temel tür envantere ilk girdiğinde (`Inventory.contents_changed` ->
+  `farm._check_discoveries`) bildirim + melodi. Büyük slime keşif sayılmaz.
+  Kayıtta `discovered`; yüklerken envanterdeki slimelar sessizce keşfedilir.
+- Debug paneli: "+Meyveler", "+Sebzeler", "+Etler", "Tümünü keşfet".
 
 ### Beslenme (diyet)
 - `ItemType.food_kind` (FRUIT elma, VEGGIE havuç, MEAT tavuk/horoz, NONE civciv),
@@ -219,3 +246,5 @@ kurar. Ana menüden 3 kayıt slotu, yatakta uyuyunca kayıt.
 12. Tavuk/horoz/civciv + yuvalar; meyve/sebze/et diyetleri (büyük slime ikisini de yer);
     doğuda geniş dağlık bölge + 3 tür (keçi, kar, tüy); F1 debug paneli.
 13. Sesler (koddan sentez, Sfx autoload), kümes genişletme (16), tarla süreleri makul + gübre, kümes/tarla kaldırma.
+14. 2 yeni meyve + 2 yeni sebze (doğada kaynakları, tarlaya ekilebilir), kaya tavuğu ve taş
+    yuvası, favori yiyecek (2x gem), Slime Kitabı (B) ve keşif bildirimi.

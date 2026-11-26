@@ -60,6 +60,7 @@ static func hybrid(a: SlimeType, b: SlimeType) -> SlimeType:
 	t.max_stack = LARGE_MAX_STACK
 	t.hop_height = maxf(first.hop_height, second.hop_height)
 	t.diet = first.diet | second.diet
+	t.favorite = first.favorite  # ikincisi secondary.favorite (SlimeType.favorites)
 	t.hop_speed = (first.hop_speed + second.hop_speed) * 0.5 * LARGE_SPEED_FACTOR
 	t.idle_time_min = (first.idle_time_min + second.idle_time_min) * 0.5
 	t.idle_time_max = (first.idle_time_max + second.idle_time_max) * 0.5

@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" path="res://assets/slimes_icons.png" id="2_sheet"]
 [ext_resource type="PackedScene" path="res://scenes/slime.tscn" id="3_scene"]
 [ext_resource type="Resource" path="res://data/items/feather_gem.tres" id="4_gem"]
+[ext_resource type="Resource" path="res://data/items/rock_hen.tres" id="5_fav"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_icon"]
 atlas = ExtResource("2_sheet")
@@ -25,3 +26,4 @@ idle_time_max = 1.4
 full_duration = 300.0
 gem = ExtResource("4_gem")
 diet = 4
+favorite = ExtResource("5_fav")

@@ -68,10 +68,10 @@ func _ready() -> void:
 	_add(grid, "Slime doyur", _set_hunger.bind(false))
 	_add(grid, "Civciv büyüt", _grow_chicks)
 	_add(grid, "Şimdi kaydet", _save_now)
-	_add(grid, "+5 Elma", _give.bind("apple", 5))
-	_add(grid, "+5 Havuç", _give.bind("carrot", 5))
-	_add(grid, "+3 Tavuk", _give.bind("hen", 3))
-	_add(grid, "+3 Civciv", _give.bind("chick", 3))
+	_add(grid, "+Meyveler", _give_all.bind(["apple", "star_fruit", "moon_grape"], 5))
+	_add(grid, "+Sebzeler", _give_all.bind(["carrot", "beet", "ice_radish"], 5))
+	_add(grid, "+Etler", _give_all.bind(["hen", "rock_hen"], 3))
+	_add(grid, "Tümünü keşfet", func() -> void: farm.call(&"debug_discover_all"))
 	_refresh()
 
 
@@ -155,6 +155,11 @@ func _grow_chicks() -> void:
 
 func _save_now() -> void:
 	farm.call(&"debug_save")
+
+
+func _give_all(ids: Array, count: int) -> void:
+	for id: String in ids:
+		_give(id, count)
 
 
 func _give(id: String, count: int) -> void:

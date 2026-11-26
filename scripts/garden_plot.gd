@@ -53,8 +53,15 @@ const FERTILIZER_SPEED: float = 2.0
 const CROP_TREES: Dictionary = {
 	"apple": "res://scenes/fruit_tree.tscn",
 	"carrot": "res://scenes/carrot_patch.tscn",
+	"star_fruit": "res://scenes/star_fruit_tree.tscn",
+	"moon_grape": "res://scenes/grape_vine.tscn",
+	"beet": "res://scenes/beet_patch.tscn",
+	"ice_radish": "res://scenes/radish_patch.tscn",
 }
-const CROP_NAMES: Dictionary = {"apple": "Elma ağacı", "carrot": "Havuç yığını"}
+const CROP_NAMES: Dictionary = {
+	"apple": "Elma ağacı", "carrot": "Havuç yığını", "star_fruit": "Yıldız meyvesi ağacı",
+	"moon_grape": "Ay üzümü asması", "beet": "Pancar yığını", "ice_radish": "Buz turpu yığını",
+}
 const FIELD_CHECK_INTERVAL: float = 0.5
 
 const SOURCE_ID: int = 0
@@ -162,7 +169,7 @@ func prompt_text(player_pos: Vector2) -> String:
 			var fert: String = " · gübreli" if has_fertilizer else ""
 			match crop_state:
 				Crop.NONE:
-					return "[E] Tarla: içine elma ya da havuç at" + fert
+					return "[E] Tarla: içine meyve ya da sebze at" + fert
 				Crop.GROWING:
 					return "[E] Fidan büyüyor · %dsn%s" % [ceili(grow_left / _grow_speed()), fert]
 				Crop.GROWN:

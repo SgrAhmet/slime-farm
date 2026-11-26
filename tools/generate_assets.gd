@@ -38,6 +38,9 @@ func _initialize() -> void:
 	_save(_make_dirt_mound(), "res://assets/dirt_mound.png")
 	_save(_make_chickens(), "res://assets/chickens.png")
 	_save(_make_nest(), "res://assets/nest.png")
+	_save(_make_rock_nest(), "res://assets/nest_rock.png")
+	_save(_make_star_tree(), "res://assets/tree_star.png")
+	_save(_make_grape_vine(), "res://assets/grape_vine.png")
 	quit()
 
 
@@ -99,6 +102,15 @@ func _make_house() -> Image:
 
 
 func _make_tree() -> Image:
+	return _tree_image(Color("4f9a3a"), Color("2f6b2a"), Color("7cc152"))
+
+
+## Yıldız meyvesi ağacı: altın sarısı yapraklar.
+func _make_star_tree() -> Image:
+	return _tree_image(Color("b8b040"), Color("6a6418"), Color("ecdf78"))
+
+
+func _tree_image(leaf: Color, dark: Color, light: Color) -> Image:
 	var img: Image = Image.create_empty(32, 48, false, Image.FORMAT_RGBA8)
 	# Gövde
 	img.fill_rect(Rect2i(12, 30, 8, 17), Color("3a2516"))
@@ -106,9 +118,6 @@ func _make_tree() -> Image:
 	img.fill_rect(Rect2i(14, 32, 1, 12), Color("9a6a3a"))
 	img.fill_rect(Rect2i(11, 45, 10, 2), Color("3a2516"))
 	# Yaprak kümesi: birkaç üst üste yuvarlak
-	var dark: Color = Color("2f6b2a")
-	var leaf: Color = Color("4f9a3a")
-	var light: Color = Color("7cc152")
 	_blob(img, Vector2(9, 22), Vector2(9, 8), leaf, dark)
 	_blob(img, Vector2(23, 22), Vector2(9, 8), leaf, dark)
 	_blob(img, Vector2(16, 14), Vector2(13, 12), leaf, dark)
@@ -1092,7 +1101,12 @@ const GEM_PALETTES: Array = [
 # Satır: 0 elma, 1-4 gemler, 5 havuç
 const CARROT_ROW: int = 5
 ## Satır 6-13: yeni türlerin gemleri (havuçtan sonra; GEM_PALETTES[4..])
-const ITEM_ROWS: int = 14
+const ITEM_ROWS: int = 18
+## Yeni yiyecekler (satır): 14 yıldız meyvesi, 15 ay üzümü, 16 pancar, 17 buz turpu
+const STAR_ROW: int = 14
+const GRAPE_ROW: int = 15
+const BEET_ROW: int = 16
+const RADISH_ROW: int = 17
 
 
 func _gem_row(g: int) -> int:
@@ -1107,6 +1121,136 @@ func _make_items() -> Image:
 			_draw_gem(img, Vector2i(col * TILE, _gem_row(g) * TILE), GEM_PALETTES[g], col == 1)
 		_draw_carrot(img, Vector2i(col * TILE, CARROT_ROW * TILE), col == 1)
 	_draw_planted_carrot(img, Vector2i(2 * TILE, CARROT_ROW * TILE))
+	for col: int in 2:
+		var shine: bool = col == 1
+		_draw_star_fruit(img, Vector2i(col * TILE, STAR_ROW * TILE), shine)
+		_draw_moon_grape(img, Vector2i(col * TILE, GRAPE_ROW * TILE), shine)
+		_draw_root(img, Vector2i(col * TILE, BEET_ROW * TILE), BEET_PAL, shine, false)
+		_draw_root(img, Vector2i(col * TILE, RADISH_ROW * TILE), RADISH_PAL, shine, false)
+	_draw_root(img, Vector2i(2 * TILE, BEET_ROW * TILE), BEET_PAL, false, true)
+	_draw_root(img, Vector2i(2 * TILE, RADISH_ROW * TILE), RADISH_PAL, false, true)
+	return img
+
+
+## Kök sebze paleti: [gövde, kontur, parlak, yaprak, koyu yaprak, sap, uzunluk]
+const BEET_PAL: Array = [Color("a01e5a"), Color("4e0a2a"), Color("d85a96"), Color("4caf50"), Color("2e7d32"), Color("c0306a"), 3.8]
+const RADISH_PAL: Array = [Color("bfe8ff"), Color("3a7aa8"), Color("ffffff"), Color("5ac8b0"), Color("2a7a6a"), Color("8adcd0"), 4.8]
+
+
+## Kök sebze (pancar / buz turpu). planted: sadece tepesi ve yaprakları görünür.
+func _draw_root(img: Image, o: Vector2i, pal: Array, shine: bool, planted: bool) -> void:
+	var g: Dictionary = {"o": o, "t": TILE}
+	var ry: float = pal[6]
+	var center: Vector2 = Vector2(8, 13.5) if planted else Vector2(8, 15.0 - ry - 1.5)
+	var pts: Array = []
+	for pt: Vector2i in _ellipse_pts(center, Vector2(3.6, ry)):
+		if planted and pt.y > 12:
+			continue
+		pts.append(pt)
+	var acc: Dictionary = {}
+	if not planted:
+		# Sivri kuyruk
+		var tail: Vector2i = Vector2i(8, int(center.y + ry) + 1)
+		pts.append(tail)
+		acc[tail] = pal[1]
+	for pt: Vector2i in pts:
+		if pt.x <= 6 and pt.y <= center.y - 1:
+			acc[pt] = pal[2]
+		elif pt.y >= center.y + ry * 0.4:
+			acc[pt] = pal[0].darkened(0.15)
+	_shape(img, g, pts, pal[0], pal[1], acc)
+	if planted:
+		img.fill_rect(Rect2i(o + Vector2i(4, 13), Vector2i(9, 1)), Color("5e3920"))
+	# Yapraklar
+	var top: int = int(center.y - ry) - 1
+	for lp: Vector2i in [Vector2i(7, 0), Vector2i(6, -1), Vector2i(5, -2), Vector2i(9, 0), Vector2i(10, -1),
+			Vector2i(11, -2), Vector2i(8, -1), Vector2i(8, -2), Vector2i(8, -3), Vector2i(4, -3), Vector2i(12, -3)]:
+		img.set_pixelv(o + Vector2i(lp.x, top + lp.y), pal[3])
+	for lp: Vector2i in [Vector2i(8, 0), Vector2i(7, -1), Vector2i(9, -1)]:
+		img.set_pixelv(o + Vector2i(lp.x, top + lp.y), pal[5])
+	img.set_pixelv(o + Vector2i(5, top - 1), pal[4])
+	img.set_pixelv(o + Vector2i(11, top - 1), pal[4])
+	if shine:
+		img.set_pixelv(o + Vector2i(6, int(center.y) - 1), Color.WHITE)
+
+
+## Yıldız meyvesi: beş köşeli sarı yıldız.
+func _draw_star_fruit(img: Image, o: Vector2i, shine: bool) -> void:
+	var g: Dictionary = {"o": o, "t": TILE}
+	var c: Vector2 = Vector2(8, 9.5)
+	var poly: PackedVector2Array = PackedVector2Array()
+	for i: int in 10:
+		var radius: float = 6.2 if i % 2 == 0 else 2.8
+		poly.append(c + Vector2.from_angle(-PI / 2.0 + i * PI / 5.0) * radius)
+	var pts: Array = []
+	var acc: Dictionary = {}
+	for y: int in TILE:
+		for x: int in TILE:
+			var p: Vector2 = Vector2(x + 0.5, y + 0.5)
+			if Geometry2D.is_point_in_polygon(p, poly):
+				var pt: Vector2i = Vector2i(x, y)
+				pts.append(pt)
+				if p.y > c.y + 1.5:
+					acc[pt] = Color("e0b020")
+				elif p.distance_to(c + Vector2(-1.5, -1.5)) < 1.6:
+					acc[pt] = Color("fff3a0")
+	_shape(img, g, pts, Color("f5d442"), Color("8a6a10"), acc)
+	img.set_pixelv(o + Vector2i(8, 2), Color("6e4524"))
+	if shine:
+		img.set_pixelv(o + Vector2i(6, 8), Color.WHITE)
+
+
+## Ay üzümü: soluk mor, parlayan üzüm salkımı.
+func _draw_moon_grape(img: Image, o: Vector2i, shine: bool) -> void:
+	var g: Dictionary = {"o": o, "t": TILE}
+	var pts: Array = []
+	var acc: Dictionary = {}
+	for gc: Vector2 in [Vector2(6, 7), Vector2(10, 7), Vector2(8, 9.5), Vector2(5, 10), Vector2(11, 10), Vector2(8, 12.5)]:
+		for pt: Vector2i in _ellipse_pts(gc, Vector2(2.1, 2.1)):
+			if not pts.has(pt):
+				pts.append(pt)
+		acc[Vector2i(int(gc.x) - 1, int(gc.y) - 1)] = Color("f4f0ff")
+	_shape(img, g, pts, Color("b0a0ee"), Color("3e2e80"), acc)
+	img.fill_rect(Rect2i(o + Vector2i(8, 2), Vector2i(1, 3)), Color("6e4524"))
+	for lp: Vector2i in [Vector2i(9, 3), Vector2i(10, 2), Vector2i(11, 2), Vector2i(10, 3)]:
+		img.set_pixelv(o + lp, Color("4caf50"))
+	if shine:
+		img.set_pixelv(o + Vector2i(7, 9), Color.WHITE)
+		img.set_pixelv(o + Vector2i(12, 5), Color(1, 1, 1, 0.7))
+
+
+## Ay üzümü asması: iki direk + kiriş, koyu yapraklar.
+func _make_grape_vine() -> Image:
+	var img: Image = Image.create_empty(32, 32, false, Image.FORMAT_RGBA8)
+	var wood: Color = Color("8a5a30")
+	var wood_dark: Color = Color("3a2516")
+	for x: int in [5, 25]:
+		img.fill_rect(Rect2i(x - 1, 8, 4, 24), wood_dark)
+		img.fill_rect(Rect2i(x, 8, 2, 23), wood)
+	img.fill_rect(Rect2i(3, 7, 26, 4), wood_dark)
+	img.fill_rect(Rect2i(4, 8, 24, 2), wood)
+	var leaf: Color = Color("3a7a5a")
+	var dark: Color = Color("1f4a36")
+	_blob(img, Vector2(9, 11), Vector2(7, 5), leaf, dark)
+	_blob(img, Vector2(22, 11), Vector2(7, 5), leaf, dark)
+	_blob(img, Vector2(16, 8), Vector2(8, 5), Color("4a8a6a"), dark)
+	for p: Vector2i in [Vector2i(12, 5), Vector2i(13, 5), Vector2i(19, 6), Vector2i(6, 9)]:
+		img.set_pixelv(p, Color("7cc192"))
+	return img
+
+
+## Kaya tavuğu yuvası: taş halka, içinde saman ve benekli yumurtalar.
+func _make_rock_nest() -> Image:
+	var img: Image = Image.create_empty(24, 14, false, Image.FORMAT_RGBA8)
+	_blob(img, Vector2(12, 8), Vector2(10, 4.5), Color("b09858"), Color("6e5020"))
+	for sc: Vector2 in [Vector2(3, 8), Vector2(6, 11.5), Vector2(12, 12.5), Vector2(18, 11.5), Vector2(21, 8),
+			Vector2(17, 4.5), Vector2(7, 4.5), Vector2(12, 3.5)]:
+		_blob(img, sc, Vector2(2.6, 2.1), Color("8a8478"), Color("4a463e"))
+		img.set_pixelv(Vector2i(int(sc.x) - 1, int(sc.y) - 1), Color("b8b2a6"))
+	for e: Vector2i in [Vector2i(9, 6), Vector2i(13, 7)]:
+		img.fill_rect(Rect2i(e, Vector2i(3, 3)), Color("d8d0c0"))
+		img.set_pixelv(e + Vector2i(1, 1), Color("7a7064"))
+		img.set_pixelv(e, Color("f0ead8"))
 	return img
 
 
@@ -1156,15 +1300,15 @@ func _draw_planted_carrot(img: Image, o: Vector2i) -> void:
 
 # ---------------------------------------------------------------- Tavuklar
 
-## chickens.png: 16x16, satır 0 tavuk, 1 horoz, 2 civciv; sütun 0 duruş,
+## chickens.png: 16x16, satır 0 tavuk, 1 horoz, 2 civciv, 3 kaya tavuğu, 4 kaya civcivi; sütun 0 duruş,
 ## 1-2 yürüme, 3 gagalama, 4-5 kanat çırpma (vakumda / uçarken). Sağa bakar.
 const CHICKEN_FRAMES: int = 6
 const CHICK_OUTLINE: Color = Color("4a3a2a")
 
 
 func _make_chickens() -> Image:
-	var img: Image = Image.create_empty(TILE * CHICKEN_FRAMES, TILE * 3, false, Image.FORMAT_RGBA8)
-	for kind: int in 3:
+	var img: Image = Image.create_empty(TILE * CHICKEN_FRAMES, TILE * 5, false, Image.FORMAT_RGBA8)
+	for kind: int in 5:
 		for f: int in CHICKEN_FRAMES:
 			_draw_chicken(img, Vector2i(f * TILE, kind * TILE), kind, f)
 	return img
@@ -1182,9 +1326,9 @@ func _ellipse_pts(c: Vector2, r: Vector2) -> Array:
 
 func _draw_chicken(img: Image, o: Vector2i, kind: int, frame: int) -> void:
 	var g: Dictionary = {"o": o, "t": TILE}
-	var chick: bool = kind == 2
-	var body_c: Color = [Color("f4f0e8"), Color("c8642a"), Color("f5d84a")][kind]
-	var shade: Color = [Color("d4ccc0"), Color("9a4a1e"), Color("d8b830")][kind]
+	var chick: bool = kind == 2 or kind == 4
+	var body_c: Color = [Color("f4f0e8"), Color("c8642a"), Color("f5d84a"), Color("8a8478"), Color("b8b2a6")][kind]
+	var shade: Color = [Color("d4ccc0"), Color("9a4a1e"), Color("d8b830"), Color("5e5a50"), Color("8a8478")][kind]
 	var peck: bool = frame == 3
 	var flap: bool = frame >= 4
 	var bob: int = 1 if frame == 2 else 0
@@ -1224,6 +1368,12 @@ func _draw_chicken(img: Image, o: Vector2i, kind: int, frame: int) -> void:
 	else:
 		for wp: Vector2i in ([Vector2i(6, 11), Vector2i(7, 11), Vector2i(8, 12)] if chick else [Vector2i(5, 10), Vector2i(6, 10), Vector2i(7, 10), Vector2i(6, 11), Vector2i(7, 11), Vector2i(8, 11)]):
 			acc[wp + Vector2i(0, bob)] = shade
+	# Kaya tavuğu: taş benekleri
+	if kind >= 3:
+		for sp: Vector2i in [Vector2i(5, 9), Vector2i(8, 12), Vector2i(3, 11), Vector2i(9, 9), Vector2i(6, 13), Vector2i(11, 5)]:
+			var spp: Vector2i = sp + Vector2i(0, bob) + (Vector2i(1, 1) if chick else Vector2i.ZERO)
+			if pts.has(spp):
+				acc[spp] = Color("4a463e") if (sp.x + sp.y) % 2 == 0 else Color("c8c2b6")
 	# Bacaklar (gövdeden önce, kontur almasınlar diye sonra çizilir)
 	_shape(img, g, pts, body_c, CHICK_OUTLINE, acc)
 	var leg: Color = Color("e8902a")
@@ -1245,7 +1395,7 @@ func _draw_chicken(img: Image, o: Vector2i, kind: int, frame: int) -> void:
 	if not chick:
 		img.set_pixel(o.x + hx + 3, o.y + hy - 1, beak)
 		img.set_pixel(o.x + hx + 4, o.y + hy, beak)
-		var comb: Color = Color("e03a3a")
+		var comb: Color = Color("e07a2a") if kind == 3 else Color("e03a3a")
 		var comb_pts: Array = [Vector2i(0, -3), Vector2i(1, -3)]
 		if kind == 1:
 			comb_pts = [Vector2i(-1, -3), Vector2i(0, -3), Vector2i(1, -3), Vector2i(0, -4), Vector2i(-1, -4), Vector2i(1, -4), Vector2i(2, -3)]

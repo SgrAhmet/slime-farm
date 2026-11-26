@@ -13,10 +13,13 @@ const FRAME_PECK: int = 3
 const FRAME_FLAP_A: int = 4
 const FRAME_FLAP_B: int = 5
 
-const CHICK_ID: StringName = &"chick"
+## Civciv kimliği -> büyüyünce olabilecekleri [kimlik, birikimli olasılık]
+const GROWTH: Dictionary = {
+	"chick": [["rooster", 0.35], ["hen", 1.0]],
+	"rock_chick": [["rock_hen", 1.0]],
+}
 ## Civcivin büyüme süresi (oyun saniyesi).
 const GROW_TIME: float = 120.0
-const ROOSTER_CHANCE: float = 0.35
 const WALK_SPEED: float = 16.0
 const CHICK_WALK_SPEED: float = 12.0
 ## Yuvadan bu kadar uzaklaşınca geri döner (piksel).
@@ -44,7 +47,7 @@ func _ready() -> void:
 
 
 func is_chick() -> bool:
-	return item.id == CHICK_ID
+	return GROWTH.has(String(item.id))
 
 
 func get_carry_data() -> Dictionary:
@@ -60,8 +63,12 @@ func apply_carry_data(data: Dictionary) -> void:
 func grow_up() -> void:
 	if not is_chick():
 		return
-	# (hen.tres bu sahneyi kullandığı için preload döngüsü olmasın: çalışma anında yükle)
-	item = ItemDatabase.get_item("rooster" if randf() < ROOSTER_CHANCE else "hen")
+	# (tavuk .tres'leri bu sahneyi kullandığı için preload döngüsü olmasın: çalışma anında yükle)
+	var roll: float = randf()
+	for option: Array in GROWTH[String(item.id)]:
+		if roll <= float(option[1]):
+			item = ItemDatabase.get_item(option[0])
+			break
 	_grow_at = -1.0
 	Sfx.play_at("chicken", global_position)
 	for i: int in 3:

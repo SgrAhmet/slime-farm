@@ -229,11 +229,12 @@ func _finish_eating() -> void:
 		if other != null and not slime_type.is_large():
 			_start_transform(other)
 			return
-	_start_happy()
+	_start_happy(eaten)
 
 
-## Elma yedikten sonra: sevinç, kalpler, gem(ler), tokluk.
-func _start_happy() -> void:
+## Yiyecek yedikten sonra: sevinç, kalpler, gem(ler), tokluk.
+## Favori yiyecekse her gemden 2 tane.
+func _start_happy(eaten: ItemType = null) -> void:
 	_hungry_at = _now() + slime_type.full_duration
 	var head: float = _head_y()
 	Fx.pop_icon(self, Vector2(-6, head), HEART_TEX, 0.0)
@@ -247,6 +248,9 @@ func _start_happy() -> void:
 		gems.append(slime_type.gem)
 	if slime_type.is_large() and slime_type.secondary.gem != null:
 		gems.append(slime_type.secondary.gem)
+	if eaten != null and slime_type.favorites().has(eaten):
+		gems.append_array(gems.duplicate())
+		Fx.pop_text(self, Vector2(0, head - 12), "Favori! x2", Color(1.0, 0.6, 0.8))
 	var base_angle: float = randf() * TAU
 	for i: int in gems.size():
 		var angle: float = base_angle + TAU * i / gems.size()
@@ -322,6 +326,10 @@ func _show_want() -> void:
 	if options.is_empty():
 		return
 	var food: ItemType = ItemDatabase.get_item(options.pick_random())
+	# Yarı yarıya favorisini göster
+	var favs: Array[ItemType] = slime_type.favorites()
+	if not favs.is_empty() and randf() < 0.5:
+		food = favs.pick_random()
 	if food != null:
 		Fx.pop_icon(self, Vector2(0, _head_y() - 4), food.icon)
 

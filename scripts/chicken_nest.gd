@@ -9,8 +9,9 @@ const MAX_BIRDS: int = 3
 const RADIUS: float = 72.0
 const SPAWN_TIME: float = 45.0
 const COUNT_INTERVAL: float = 0.5
-## [kimlik, olasılık eşiği (birikimli)]
-const SPAWN_TABLE: Array = [["chick", 0.5], ["hen", 0.85], ["rooster", 1.0]]
+## Çıkan kuşlar ve birikimli olasılık eşikleri (kaya yuvası: kaya civcivi / kaya tavuğu).
+@export var spawn_ids: PackedStringArray = PackedStringArray(["chick", "hen", "rooster"])
+@export var spawn_chances: PackedFloat32Array = PackedFloat32Array([0.5, 0.85, 1.0])
 const POP_TIME: float = 0.3
 
 var _timer: float = SPAWN_TIME
@@ -41,10 +42,10 @@ func fill(count: int = 2) -> void:
 
 func spawn_bird(animate: bool) -> Node:
 	var roll: float = randf()
-	var id: String = "hen"
-	for row: Array in SPAWN_TABLE:
-		if roll <= float(row[1]):
-			id = row[0]
+	var id: String = spawn_ids[spawn_ids.size() - 1]
+	for i: int in spawn_ids.size():
+		if roll <= spawn_chances[i]:
+			id = spawn_ids[i]
 			break
 	var item: ItemType = ItemDatabase.get_item(id)
 	var offset: Vector2 = Vector2.from_angle(randf() * TAU) * randf_range(10.0, 20.0)

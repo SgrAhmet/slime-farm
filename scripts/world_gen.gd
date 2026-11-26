@@ -209,7 +209,8 @@ func plan_props() -> Dictionary:
 	rng.seed = 77
 	var taken: Array[Vector2i] = []
 	var plan: Dictionary = {"fruit_trees": [], "decor_trees": [], "rocks": [], "bushes": [], "carrot_patches": [],
-			"mountain_fruit_trees": [], "mountain_carrot_patches": [], "mountain_rocks": [], "nests": []}
+			"mountain_fruit_trees": [], "mountain_carrot_patches": [], "mountain_rocks": [], "nests": [],
+			"star_fruit_trees": [], "grape_vines": [], "beet_patches": [], "radish_patches": [], "rock_nests": []}
 	_scatter(plan["fruit_trees"], Region.FOREST, 5, 5.0, 2, rng, taken)
 	_scatter(plan["fruit_trees"], Region.HIGHLANDS, 3, 5.0, 2, rng, taken)
 	_scatter(plan["decor_trees"], Region.FOREST, 14, 3.5, 1, rng, taken)
@@ -226,6 +227,14 @@ func plan_props() -> Dictionary:
 	_scatter(plan["nests"], Region.FOREST, 2, 4.0, 1, rng, taken)
 	_scatter(plan["nests"], Region.HIGHLANDS, 1, 4.0, 1, rng, taken)
 	_scatter(plan["nests"], Region.MOUNTAINS, 3, 5.0, 2, rng, taken)
+	_scatter(plan["star_fruit_trees"], Region.HIGHLANDS, 2, 4.0, 1, rng, taken)
+	_scatter(plan["star_fruit_trees"], Region.MOUNTAINS, 1, 4.0, 1, rng, taken)
+	_scatter(plan["grape_vines"], Region.FOREST, 3, 3.5, 1, rng, taken)
+	_scatter(plan["beet_patches"], Region.FOREST, 2, 3.0, 1, rng, taken)
+	_scatter(plan["beet_patches"], Region.HIGHLANDS, 1, 3.0, 1, rng, taken)
+	_scatter(plan["radish_patches"], Region.MOUNTAINS, 3, 3.0, 1, rng, taken)
+	_scatter(plan["rock_nests"], Region.MOUNTAINS, 2, 5.0, 1, rng, taken)
+	_scatter(plan["rock_nests"], Region.HIGHLANDS, 1, 4.0, 1, rng, taken)
 	return plan
 
 

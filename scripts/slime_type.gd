@@ -11,6 +11,8 @@ extends ItemType
 @export var idle_time_max: float = 2.2
 ## Yediği yiyecekler (bit maskesi: 1 meyve, 2 sebze, 4 et). Büyük slimeda iki türünkü birleşir.
 @export_flags("Meyve", "Sebze", "Et") var diet: int = 7
+## En sevdiği yiyecek: bunu yiyince 2 kat gem verir.
+@export var favorite: ItemType
 ## Yemek yedikten sonra tok kalma süresi (saniye).
 @export var full_duration: float = 300.0
 ## Yemek yiyince düşürdüğü gem (büyük slimede ana rengin gemi).
@@ -26,6 +28,16 @@ func diet_text() -> String:
 		if diet & (1 << i):
 			parts.append(["Meyve", "Sebze", "Et"][i])
 	return " + ".join(parts)
+
+
+## Favori yiyecekler: büyük slimede iki türün favorisi.
+func favorites() -> Array[ItemType]:
+	var out: Array[ItemType] = []
+	if favorite != null:
+		out.append(favorite)
+	if secondary != null and secondary.favorite != null and not out.has(secondary.favorite):
+		out.append(secondary.favorite)
+	return out
 
 
 func is_large() -> bool:

@@ -87,6 +87,11 @@ const CARROT_PATCH_SCENE: PackedScene = preload("res://scenes/carrot_patch.tscn"
 const ROCK_SCENE: PackedScene = preload("res://scenes/rock.tscn")
 const BUSH_SCENE: PackedScene = preload("res://scenes/bush.tscn")
 const NEST_SCENE: PackedScene = preload("res://scenes/chicken_nest.tscn")
+const ROCK_NEST_SCENE: PackedScene = preload("res://scenes/chicken_nest_rock.tscn")
+const STAR_TREE_SCENE: PackedScene = preload("res://scenes/star_fruit_tree.tscn")
+const GRAPE_VINE_SCENE: PackedScene = preload("res://scenes/grape_vine.tscn")
+const BEET_PATCH_SCENE: PackedScene = preload("res://scenes/beet_patch.tscn")
+const RADISH_PATCH_SCENE: PackedScene = preload("res://scenes/radish_patch.tscn")
 
 const FADE_TIME: float = 0.3
 const TOAST_TIME: float = 2.0
@@ -99,6 +104,15 @@ var plots: Array[GardenPlot] = []
 var _menu_plot: GardenPlot = null
 var _trees: Array[FruitTree] = []
 var nests: Array[ChickenNest] = []
+## Slime Kitabı ve keşfedilen tür kimlikleri (kayıtta "discovered").
+var book: SlimeBook
+var discovered: Dictionary = {}
+## true iken keşifler bildirim göstermez (kayıt yüklenirken).
+var _quiet_discovery: bool = false
+const REGION_NAMES: Dictionary = {
+	WorldGen.Region.FARM: "Çiftlik", WorldGen.Region.FOREST: "Orman",
+	WorldGen.Region.HIGHLANDS: "Yayla", WorldGen.Region.MOUNTAINS: "Dağlar",
+}
 ## Slime doğmasın diye dolu sayılan hücreler.
 var _blocked: Dictionary = {}
 var _busy: bool = false
@@ -135,6 +149,15 @@ func _ready() -> void:
 	interior.exit_entered.connect(_on_interior_exit_entered)
 	build_menu.option_chosen.connect(_on_build_option_chosen)
 	build_menu.closed.connect(_on_build_menu_closed)
+	book = SlimeBook.new()
+	book.name = "SlimeBook"
+	book.discovered = discovered
+	book.regions = _slime_regions()
+	$HUD.add_child(book)
+	$HUD.move_child(book, fade.get_index())
+	book.closed.connect(func() -> void: player.input_enabled = true)
+	player.inventory.contents_changed.connect(_check_discoveries)
+
 	var debug: DebugPanel = DebugPanel.new()
 	debug.name = "DebugPanel"
 	debug.farm = self
@@ -152,6 +175,7 @@ func _ready() -> void:
 	hint.offset_top = 17.0
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	$HUD.add_child(hint)
+	$HUD.move_child(hint, book.get_index())  # kitap açıkken üstünde görünmesin
 	debug.visibility_changed.connect(func() -> void: hint.visible = not debug.visible)
 
 	var save: Dictionary = Game.take_pending_load()
@@ -173,6 +197,13 @@ func _process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	var key: InputEventKey = event as InputEventKey
+	if key != null and key.pressed and not key.echo and key.keycode == KEY_B:
+		_toggle_book()
+		get_viewport().set_input_as_handled()
+		return
+	if book.visible:
+		return
 	if not event.is_action_pressed(&"interact") or _busy or build_menu.visible:
 		return
 	if area == Area.HOUSE:
@@ -196,6 +227,58 @@ func _unhandled_input(event: InputEvent) -> void:
 				_show_toast("Toplayıcı boş")
 			else:
 				_show_toast("Envanter dolu")
+
+
+# ---------------------------------------------------------------- Slime Kitabı
+
+func _toggle_book() -> void:
+	if book.visible:
+		book.close()
+		return
+	if _busy or build_menu.visible:
+		return
+	player.input_enabled = false
+	book.open()
+
+
+## Envantere ilk kez giren temel slime türünü keşfet.
+func _check_discoveries() -> void:
+	for i: int in Inventory.SLOT_COUNT:
+		var t: SlimeType = player.inventory.get_item(i) as SlimeType
+		if t != null and not t.is_large():
+			discover(t)
+
+
+func discover(t: SlimeType) -> void:
+	var id: String = String(t.id)
+	if discovered.has(id):
+		return
+	discovered[id] = true
+	if not _quiet_discovery:
+		_show_toast("Yeni keşif: %s! [B]" % t.display_name)
+		Sfx.play("save_jingle")
+
+
+## Tür kimliği -> "Orman, Yayla" (başlangıçta doğdukları bölgeler).
+func _slime_regions() -> Dictionary:
+	var types: Array[SlimeType] = SlimeRegistry.base_types()
+	var lists: Dictionary = {}
+	for spec: Array in INITIAL_SLIMES:
+		var id: String = String(types[spec[1]].id)
+		var names: Array = lists.get(id, [])
+		var region_name: String = REGION_NAMES.get(spec[0], "?")
+		if not names.has(region_name):
+			names.append(region_name)
+		lists[id] = names
+	var out: Dictionary = {}
+	for id: String in lists:
+		out[id] = ", ".join(PackedStringArray(lists[id]))
+	return out
+
+
+func debug_discover_all() -> void:
+	for t: SlimeType in SlimeRegistry.base_types():
+		discover(t)
 
 
 ## Ekranın altındaki ipucu: yatak, arsa/kümes/tarla durumu.
@@ -348,6 +431,13 @@ func _place_props() -> void:
 		_trees.append(_place(CARROT_PATCH_SCENE, pos) as FruitTree)
 	for pos: Vector2 in _concat(NEST_POSITIONS, plan["nests"]):
 		nests.append(_place(NEST_SCENE, pos) as ChickenNest)
+	# Yeni yiyecek kaynakları ve kaya yuvaları: yine listelerin SONUNA
+	for spec: Array in [[STAR_TREE_SCENE, "star_fruit_trees"], [GRAPE_VINE_SCENE, "grape_vines"],
+			[BEET_PATCH_SCENE, "beet_patches"], [RADISH_PATCH_SCENE, "radish_patches"]]:
+		for pos: Vector2 in plan[spec[1]]:
+			_trees.append(_place(spec[0], pos) as FruitTree)
+	for pos: Vector2 in plan["rock_nests"]:
+		nests.append(_place(ROCK_NEST_SCENE, pos) as ChickenNest)
 	for pos: Vector2 in plan["mountain_rocks"]:
 		_place(ROCK_SCENE, pos)
 	for pos: Vector2 in plan["decor_trees"]:
@@ -452,12 +542,18 @@ func _collect_save() -> Dictionary:
 		"trees": trees,
 		"nests": nests.map(func(n: ChickenNest) -> float: return n.get_state()),
 		"populated": _all_region_names(),
+		"discovered": discovered.keys(),
 		"plots": plots.map(func(p: GardenPlot) -> Dictionary: return p.get_state()),
 	}
 
 
 func _apply_save(data: Dictionary) -> void:
+	for id: Variant in data.get("discovered", []):
+		discovered[str(id)] = true
+	_quiet_discovery = true
 	player.inventory.from_dict(data.get("inventory", {}))
+	_check_discoveries()  # envanterdeki slimelar zaten tanınıyor sayılır
+	_quiet_discovery = false
 
 	# Arsalar önce: kümes duvarları slimelar doğmadan yerinde olsun
 	var plot_states: Array = data.get("plots", [])

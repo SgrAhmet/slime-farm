@@ -1,0 +1,16 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/fruit_tree.gd" id="1_source"]
+[ext_resource type="Resource" path="res://data/items/moon_grape.tres" id="2_produce"]
+[ext_resource type="Texture2D" path="res://assets/grape_vine.png" id="3_tex"]
+
+[node name="GrapeVine" type="StaticBody2D"]
+collision_layer = 0
+collision_mask = 0
+script = ExtResource("1_source")
+produce = ExtResource("2_produce")
+slot_offsets = Array[Vector2]([Vector2(-9, -13), Vector2(9, -13), Vector2(1, -17)])
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+position = Vector2(0, -16)
+texture = ExtResource("3_tex")
